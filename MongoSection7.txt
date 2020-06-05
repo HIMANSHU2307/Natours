@@ -1,0 +1,48 @@
+DB -> Collections -> documents
+VS
+DB -> Tables -> Rows
+
+use natours-test 
+// To Create new database
+
+db.tours.insertOne({ name: "The Forest Hiker", price: 297, rating: 4.7 })
+// Adding a new Collection tours with a single documents
+
+db.tours.find()
+// To find the collection, and show all the docs
+
+show dbs
+// Show all the databases
+
+show collections
+// show all the collections
+
+quit()
+
+db.tours.insertMany([{ name: "The Forest Hiker", price: 297, rating: 4.7 }, { name: "Mountain", price: 1000, rating: 4.2}, { name: "Riding", price: 5000, rating: 4.8, difficulty: "hard"}])
+// for multiple document entry
+
+db.tours.find({difficulty: "easy"}, {rating: {$gte: 4.8}})
+// to search with query, seperating multiple query using comma, gte: greater than or equal. lte: less than or equal
+
+find({$or: [array of conditoins {difficulty: "easy", rating: {$gte: 4.8}}]})
+// will return if any condition satisfy
+
+find({$or: [{difficulty: "easy"}, {rating: {$gte: 4.8}}]}, {name: 1})
+// in this case only name will be shown in the output inspite of all the details
+
+db.tours.updateOne({name: "Riding"}, { $set: {price: 2000}});
+// first object is to select the document of the collection, Second is to update that field, Set is used to update that particular field
+
+db.tours.updateMany({difficulty: "easy"}, {rating: {$gte: 4.8}}, { $set: {premium: 2000}});
+// first arg is to find as per the condition(search query), secoud is to change the property
+
+db.tours.deleteOne({Query})
+db.tours.deleteMany({multiple query})
+// deleting the docs
+db.tours.delete({})
+//to delete all
+
+
+
+

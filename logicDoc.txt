@@ -1,0 +1,6 @@
+Flow:
+
+Server.js(setting up the server details) 
+----->  app.js(all app related setting, defining middlewares like routes) 
+-----> Routes(contains all the routes) 
+-----> Controllers(all the Handlers)

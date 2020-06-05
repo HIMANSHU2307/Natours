@@ -1,0 +1,221 @@
+const express = require('express');
+const morgan = require('morgan');
+const fs = require('fs');
+//Node. js includes fs module to access physical file system. The fs module is responsible for all the asynchronous or synchronous file I/O operations.
+
+const app = express();
+// 1) MIDDLEWARES
+app.use(morgan('dev'));// for morgan checkout google
+// to get the incoming data fom client to the server a middlewear is required
+app.use(express.json());
+// express.json is the middlewear here, req goes through this middlewear
+
+// 2) HANDLERS
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`));
+
+// tours
+const getAllTours = (req, res) => {
+    res
+        .status(200)
+        .json({
+            status: 'success',
+            result: tours.length,
+            data:{
+                tours: tours
+            }
+        });
+}
+
+const addNewTour = (req, res) => {
+    const newId = tours[tours.length - 1].id + 1;
+    const newTour = Object.assign({ id: newId}, req.body);
+    tours.push(newTour);
+    fs.writeFile(`${__dirname}/dev-data/data/tours-simple.json`, 
+        JSON.stringify(tours), 
+        err => {
+            res
+                .status(201)
+                .json({
+                    status: 'success',
+                    data: newTour
+                }); // 201 is for created
+        });
+}
+
+const getTour =  (req, res) => {// ? makes a param optional
+    const id = req.params.id * 1;
+    if (id > tours.length) {
+        return res.status(404)
+                  .json({
+                      status: 'fail',
+                      message: 'Request Invalid'
+                  })  
+    }
+
+    const tour = tours.find( tour => tour.id === req.params.id*1); // by multiplying with 1 it will convert string into integer
+    res
+        .status(200)
+        .json({
+            status: 'success',
+            data:{
+                tour: tour
+            }
+        });
+}
+
+const updateTour = (req, res) => {
+    const id = req.params.id * 1;
+    if (id > tours.length) {
+        return res.status(404)
+                  .json({
+                      status: 'fail',
+                      message: 'Request Invalid'
+                  })  
+    }
+
+    res
+        .status(200)
+        .json({
+            status:'success',
+            data: {
+                tour: '<updated>'
+            }
+        })
+}
+
+const deleteTour = (req, res) => {
+    const id = req.params.id * 1;
+    if (id > tours.length) {
+        return res.status(404)
+                  .json({
+                      status: 'fail',
+                      message: 'Request Invalid'
+                  })  
+    }
+
+    res
+        .status(204) // 204 means no content
+        .json({
+            status:'success',
+            data: null
+        })
+}
+
+// users
+const getAllUsers = (req, res) => {
+    res
+        .status(500)
+        .json({
+            status: 'failure',
+            message: 'Internal Error'
+        });
+}
+
+const addNewUser = (req, res) => {
+    res
+        .status(500)
+        .json({
+            status: 'failure',
+            message: 'Internal Error'
+        });
+}
+
+const getUser = (req, res) => {
+    res
+        .status(500)
+        .json({
+            status: 'failure',
+            message: 'Internal Error'
+        });
+}
+
+const updateUser = (req, res) => {
+    res
+        .status(500)
+        .json({
+            status: 'failure',
+            message: 'Internal Error'
+        });
+}
+
+const deleteUser = (req, res) => {
+    res
+        .status(500)
+        .json({
+            status: 'failure',
+            message: 'Internal Error'
+        });
+}
+
+// app.get('/api/v1/tours', getAllTours)
+
+// GET
+// app.get('/api/v1/tours/:id/:opt?', getTour)
+
+// ADD
+// app.post('/api/v1/tours', addNewTour)
+
+// UPDATE
+// app.patch('/api/v1/tours/:id', updateTour)
+
+// DELETE
+// app.delete('/api/v1/tours/:id', deleteTour)
+
+// 3) ROUTE
+
+// tours
+const tourRouter = express.Router();
+const userRouter = express.Router();
+ // introducing Router Middleware
+
+/* app
+    .route('/api/v1/tours')
+    .get(getAllTours)
+    .post(addNewTour)
+app
+    .route('/api/v1/tours/:id/:opt?')
+    .get(getTour)
+    .patch(updateTour)
+    .delete(deleteTour) */
+// Can also be written as
+tourRouter
+    .route('/')
+    .get(getAllTours)
+    .post(addNewTour)
+
+tourRouter
+    .route('/:id/:opt?')
+    .get(getTour)
+    .patch(updateTour)
+    .delete(deleteTour)
+
+// users
+/* app
+    .route('/api/v1/users')
+    .get(getAllUsers)
+    .post(addNewUser)
+app
+    .route('/api/v1/users/:id/:opt?')
+    .get(getUser)
+    .patch(updateUser)
+    .delete(deleteUser)    */
+
+userRouter
+    .route('/')
+    .get(getAllUsers)
+    .post(addNewUser)
+userRouter
+    .route('/:id/:opt?')
+    .get(getUser)
+    .patch(updateUser)
+    .delete(deleteUser)  
+
+app.use('/api/v1/tours', tourRouter); // Router middleware
+app.use('/api/v1/users', userRouter);    
+
+// 4) START SERVER
+const port = 3000;
+
+app.listen(port, () => {
+    console.log(`App is listening on ${port}`);
+})
