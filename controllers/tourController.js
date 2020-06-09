@@ -3,6 +3,14 @@
 /* eslint-disable prettier/prettier */
 const Tour = require("../models/tourModel");
 
+exports.aliasTopTours = (req, res, next) => { 
+    // Prefilling of query for top-5-cheap
+    req.query.limit = '5';
+    req.query.sort = '-ratingsAverage,price';
+    req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+    next(); // toget out of the middleware
+};
+
 const tours = [];
 
 // 2) HANDLERS

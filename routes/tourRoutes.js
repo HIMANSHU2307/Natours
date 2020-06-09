@@ -4,10 +4,15 @@ const express = require('express');
 const router = express.Router();
 const tourController = require('../controllers/tourController'); 
 // all the exports methods will be returned, tourController will be the object with all the returned methods
-const { getAllTours, createTour, getTour, updateTour, deleteTour } = tourController;
+const { getAllTours, createTour, getTour, updateTour, deleteTour, aliasTopTours } = tourController;
 
 // middleware for checking param
 // router.param('id', checkId);
+
+// ALIASING
+router
+    .route('/top-5-cheap')
+    .get(aliasTopTours, getAllTours)  
 
 router
     .route('/')
@@ -20,5 +25,7 @@ router
     .get(getTour)
     .patch(updateTour)
     .delete(deleteTour)
+
+  
 
 module.exports = router;   
