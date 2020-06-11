@@ -128,6 +128,99 @@ exports.deleteTour = async (req, res) => {
             message: error
         })
     }
+}
 
+exports.getToursStats = async (req, res) => {
 
+    try {
+        const stats = await Tour.aggregate([
+            {
+                $match: { ratingsAverage: { $gte: 4.5 } }
+            },
+            {
+                $group: {
+                    _id:{ $toUpper: '$difficulty' }, // the data will be aggregated for each _id value
+                    num: { $sum: 1 }, // number of tours, will add every time one for each document
+                    numRatings: { $sum: '$ratingsQuantity' },
+                    avgrating: { $avg: '$ratingsAverage' },
+                    avgPrice: { $avg: '$price' },
+                    minPrice: { $min: '$price' },
+                    maxPrice: { $max: '$price' }
+                }
+            },
+            {
+                $sort: { avgPrice: 1 } // 1 for assending
+            },
+            {
+                $match: { _id: { $ne: 'EASY' } } // EXCLUDING THE EASY GROUP
+            }
+        ])
+
+        res
+            .status(200) // 204 means no content
+            .json({
+                status: 'success',
+                data: stats
+            })
+        
+    } catch (error) {
+        res.status(400).json({
+            status: 'fail',
+            message: error
+        })
+    }
+}
+
+//UNWINDING
+exports.getMonthlyPlan = async (req, res) => {
+    try {
+        const year = req.params.year * 1;
+
+        const plan = await Tour.aggregate([
+            {
+                $unwind: '$startDates' // one document for each date
+            },
+            {
+                $match: {
+                    startDates: {
+                        $gte: new Date(`${year}-01-01`),
+                        $lte: new Date(`${year}-12-31`)
+                    }
+                 }
+            },
+            {
+                $group: {
+                    _id: { $month: '$startDates' },
+                    numTourStarts: { $sum: 1 },
+                    tours: { $push: '$name' }
+                }
+            },
+            {
+                $addFields: { month: '$_id' }
+            },
+            {
+                $project: {
+                    _id: 0 // it will hide the _id for 0, 1 to show
+                }
+            },
+            {
+                $sort: { _id: 1 } // 1 for assending -1 for decending
+            }
+        ]);
+
+        res
+            .status(200) // 204 means no content
+            .json({
+                status: 'success',
+                data: {
+                    "plan": plan
+                }
+            })
+        
+    } catch (error) {
+        res.status(400).json({
+            status: 'fail',
+            message: error
+        })
+    }
 }

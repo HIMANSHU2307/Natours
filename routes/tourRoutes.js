@@ -4,7 +4,7 @@ const express = require('express');
 const router = express.Router();
 const tourController = require('../controllers/tourController'); 
 // all the exports methods will be returned, tourController will be the object with all the returned methods
-const { getAllTours, createTour, getTour, updateTour, deleteTour, aliasTopTours } = tourController;
+const { getAllTours, createTour, getTour, updateTour, deleteTour, aliasTopTours, getToursStats, getMonthlyPlan } = tourController;
 
 // middleware for checking param
 // router.param('id', checkId);
@@ -13,6 +13,16 @@ const { getAllTours, createTour, getTour, updateTour, deleteTour, aliasTopTours 
 router
     .route('/top-5-cheap')
     .get(aliasTopTours, getAllTours)  
+
+// AGGREGATE
+router
+    .route('/tour-stats')
+    .get(getToursStats)    
+
+// AGGREGATE getMonthlyPlan
+router
+    .route('/monthly-plan/:year')
+    .get(getMonthlyPlan) 
 
 router
     .route('/')

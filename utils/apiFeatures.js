@@ -1,4 +1,6 @@
 /* eslint-disable prettier/prettier */
+/* eslint-disable node/no-unsupported-features/es-syntax */
+/* eslint-disable prettier/prettier */
 class APIFeatures {
     constructor(query, queryString) {
         this.query = query;
