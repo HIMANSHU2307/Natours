@@ -10,6 +10,7 @@ npm i eslint prettier eslint-config-prettier eslint-plugin-prettier eslint-confi
 
 npm i mongoose@5
 
+npm i validator
 
 
 
